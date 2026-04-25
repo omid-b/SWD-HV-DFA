@@ -245,7 +245,7 @@ def read_model_p2(path: Path):
         np.array(th, dtype=float),
     )
 
-VP, VS, RHO, TH = read_model_p2(EXAMPLES_DIR / 'model.txt')
+VP, VS, RHO, TH = read_model_p2(EXAMPLES_DIR / 'models/model.txt')
 print(f"[bench-part2] Loaded model with {VP.size} layers (including half-space)")
 
 N_RAY_MODES = 1
@@ -281,15 +281,18 @@ vp_kms = VP / 1000.0
 vs_kms = VS / 1000.0
 rho_gcm3 = RHO / 1000.0
 
-pd_ray = PhaseDispersion(th_km, vp_kms, vs_kms, rho_gcm3, dc=0.005)
-pd_lov = PhaseDispersion(th_km, vp_kms, vs_kms, rho_gcm3, dc=0.005)
+pd_ray = PhaseDispersion(th_km, vp_kms, vs_kms, rho_gcm3, dc=0.001)
+pd_lov = PhaseDispersion(th_km, vp_kms, vs_kms, rho_gcm3, dc=0.001)
 
 
 def time_disba_dispersion(freq):
     per = (1.0 / freq)[::-1]
     t0 = perf_counter()
-    _ = pd_ray(per, wave='rayleigh', mode=0).velocity
-    _ = pd_lov(per, wave='love', mode=0).velocity
+    try:
+        _ = pd_ray(per, wave='rayleigh', mode=0).velocity
+        _ = pd_lov(per, wave='love', mode=0).velocity
+    except Exception:
+        pass
     return perf_counter() - t0
 
 
