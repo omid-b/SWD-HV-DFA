@@ -1,4 +1,4 @@
-name: hvsr
+name: hvswdpy
 channels:
   - conda-forge
   - defaults
