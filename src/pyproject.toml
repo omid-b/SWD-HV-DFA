@@ -12,7 +12,8 @@ dependencies = ["numpy"]
 license = {text = "MIT"}
 
 [project.optional-dependencies]
-dev = ["matplotlib", "jupyter"]
+examples = ["matplotlib", "jupyter", "disba"]
+dev = ["hvswdpy[examples]"]
 
 [tool.meson-python.args]
 install = ['--skip-subprojects']

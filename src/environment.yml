@@ -1,0 +1,17 @@
+name: hvsr
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - numpy
+  - matplotlib
+  - jupyter
+  - gfortran_linux-64
+  - meson
+  - meson-python>=0.16
+  - ninja
+  - pip
+  - pip:
+      - .
+      - disba
