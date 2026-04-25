@@ -15,6 +15,6 @@ HVSWDpy-f2pywrappers2.f90
 HVSWDpymodule.c
 fortranobject.c
 fortranobject.h
-examples/results/**
+**/results/**
 *.egg-info
 dist/
