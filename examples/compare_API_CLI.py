@@ -66,7 +66,12 @@ def read_model(path):
 
 
 def run_cli(model_file, nf=100, fmin=0.1, fmax=100.0, nmr=3, nml=3, prec=1.0, nks=0):
-    hv_orig = shutil.which('hv_orig') or str(ROOT / 'bin' / 'hv_orig')
+    hv_orig = shutil.which('hv_orig')
+    if not hv_orig:
+        raise FileNotFoundError(
+            'hv_orig not found on PATH. '
+            'Install the package first: pip install . (from the project root)'
+        )
     cmd = [
         hv_orig,
         '-f', str(model_file),

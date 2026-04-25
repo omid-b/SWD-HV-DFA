@@ -29,13 +29,10 @@ from typing import Tuple
 EXAMPLES_DIR = Path(__file__).resolve().parent if '__file__' in dir() else Path.cwd().resolve()
 ROOT = EXAMPLES_DIR.parent
 SRC = ROOT / 'src'
-BIN = ROOT / 'bin'
-BIN.mkdir(exist_ok=True)
 
 print(f"[setup] Examples dir : {EXAMPLES_DIR}")
 print(f"[setup] Root dir     : {ROOT}")
 print(f"[setup] Source dir   : {SRC}")
-print(f"[setup] Binary dir   : {BIN}")
 
 try:
     import hvswdpy as hv
@@ -44,16 +41,12 @@ except ModuleNotFoundError:
     import hvswdpy as hv
 print(f"[setup] hvswdpy imported from: {hv.__file__}")
 
-hv_which = shutil.which('hv_orig')
-if hv_which:
-    HV_EXE = hv_which
-elif (BIN / 'hv_orig').exists():
-    HV_EXE = str(BIN / 'hv_orig')
-else:
-    print('[setup] CLI binary not found, building via make hv_orig in src ...')
-    subprocess.run(['make', 'hv_orig'], cwd=str(SRC), check=True)
-    assert (BIN / 'hv_orig').exists(), 'Expected hv_orig to be built in bin/'
-    HV_EXE = str(BIN / 'hv_orig')
+HV_EXE = shutil.which('hv_orig')
+if not HV_EXE:
+    raise FileNotFoundError(
+        'hv_orig not found on PATH. '
+        'Install the package first: pip install . (from the project root)'
+    )
 print(f"[setup] CLI binary   : {HV_EXE}")
 print("[setup] Setup complete.\n")
 

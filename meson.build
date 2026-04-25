@@ -20,13 +20,13 @@ inc_np = include_directories(incdir_numpy, incdir_f2py)
 
 fortranobject_c = incdir_f2py / 'fortranobject.c'
 
-subdir('hvswdpy')
+subdir('src/hvswdpy')
 
 # CLI executable (hv_orig): single-file compilation with INCLUDE directives
 omp_cli = dependency('openmp', language: 'fortran', required: get_option('openmp'))
 
 cli_fortran_args = ['-ffree-form', '-ffree-line-length-none']
-cli_include = include_directories('hvswdpy/_fortran', 'cli')
+cli_include = include_directories('src/hvswdpy/_fortran', 'src/cli')
 
 cli_deps = []
 if omp_cli.found()
@@ -34,7 +34,7 @@ if omp_cli.found()
 endif
 
 executable('hv_orig',
-  'cli/HV.f90',
+  'src/cli/HV.f90',
   fortran_args: cli_fortran_args,
   include_directories: cli_include,
   dependencies: cli_deps,

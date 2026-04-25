@@ -9,13 +9,31 @@ Fortran implementation of H/V spectral ratio and surface-wave dispersion, with a
 This is a development build. The code may contain errors or unstable functionality. Contributions and feedback are welcome.
 
 ### Repository layout
-- `src/hvswdpy/`: Python package (wrapper)
-- `src/hvswdpy/_fortran/`: Fortran sources and f2py interface (`hvdfa.pyf`)
-- `src/cli/`: Fortran CLI sources (`HV.f90`, `cli_args*.f90`, optional drivers)
-- `src/Makefile`: build targets (`hv_orig`, `python`, `python-dev`)
-- `bin/`: built CLI executable (`bin/hv_orig`)
-- `examples/`: scripts and notebooks
-- `examples/results/`: output plots
+```
+SWD-HV-DFA/
+├── pyproject.toml          # Python project metadata & build-system config
+├── meson.build             # Top-level Meson build file
+├── meson_options.txt       # Meson build options (e.g. OpenMP toggle)
+├── environment.yml         # Conda environment specification
+├── README.md
+├── LICENSE
+├── src/
+│   ├── cli/                # Fortran CLI sources (hv_orig)
+│   │   ├── HV.f90
+│   │   ├── cli_args.f90
+│   │   └── ...
+│   └── hvswdpy/            # Python package (src layout)
+│       ├── __init__.py
+│       ├── hvswdpy.py
+│       ├── meson.build
+│       └── _fortran/       # Fortran sources & f2py interface
+│           ├── modules.f90
+│           ├── hvdfa.pyf
+│           └── ...
+└── examples/               # Scripts, notebooks, and data
+    ├── models/
+    └── results/
+```
 
 ### Requirements
 - gfortran (install via conda: `conda install -c conda-forge gfortran_linux-64` for Linux or `gfortran_osx-arm64`/`gfortran_osx-64` for macOS)
@@ -23,6 +41,24 @@ This is a development build. The code may contain errors or unstable functionali
 - macOS/Linux (tested on macOS ARM with Conda)
 
 ### Build / Install
+
+#### Option 1: Conda environment (recommended)
+```bash
+conda env create -f environment.yml
+conda activate hvswdpy
+```
+This creates a complete environment, installs all dependencies, compiles the Fortran extension and the `hv_orig` CLI binary.
+
+#### Option 2: pip install (from project root)
+```bash
+pip install .
+```
+This builds both the Python extension module and the `hv_orig` CLI executable, and installs all required dependencies (`numpy`, `matplotlib`, `disba`).
+
+#### Option 3: Editable install (for development)
+```bash
+pip install --no-build-isolation --editable .
+```
 
 #### Prerequisites
 1. Install gfortran:
@@ -36,46 +72,13 @@ This is a development build. The code may contain errors or unstable functionali
    conda activate your_environment
    ```
 
-#### Option 1: Build Original Fortran CLI Only
-```bash
-cd src
-make hv_orig
-```
-This creates the executable at `bin/hv_orig`.
-
-#### Option 2: Build Python Extension (In-place, Recommended for Development)
-```bash
-cd src
-make python
-```
-This builds the Python extension in-place without installing the package. Useful for testing changes.
-
-#### Option 3: Install as Editable Package (Recommended for Regular Use)
-```bash
-cd src
-make python-dev
-```
-This installs the package in editable mode and builds the compiled extensions. The package will be available system-wide in your Python environment.
-
-#### Option 4: Build Everything
-```bash
-cd src
-make all
-```
-This builds both the CLI executable and Python extension.
-
 #### Build Options
 
-You can customize the build behavior using environment variables:
+You can customize the build behavior using Meson options:
 
 - **Disable OpenMP** (if you encounter OpenMP-related issues):
   ```bash
-  USE_OPENMP=0 make python-dev
-  ```
-
-- **Custom optimization level**:
-  ```bash
-  OPT=-O3 make python-dev
+  pip install . -Csetup-args=-Dopenmp=disabled
   ```
 
 ### Model format (API)
@@ -88,15 +91,11 @@ You can customize the build behavior using environment variables:
 
 ### Original CLI usage
 ```bash
-# Build from src/
-cd src && make hv_orig  
-
-# Run from repo root
-bin/hv_orig -f examples/model.txt -fmin 0.1 -fmax 100 -nf 100 -logsam -nmr 3 -nml 3 -prec 1.0 -nks 0 -ph -hv > examples/HV.dat
+hv_orig -f examples/models/model.txt -fmin 0.1 -fmax 100 -nf 100 -logsam -nmr 3 -nml 3 -prec 1.0 -nks 0 -ph -hv > examples/HV.dat
 # Outputs in examples/: Rph.dat (Rayleigh slowness), Lph.dat (Love slowness), HV.dat (freq, hv)
 ```
 
-### Python API 
+### Python API
   ```python
   import numpy as np
   import hvswdpy as hv
@@ -126,16 +125,6 @@ bin/hv_orig -f examples/model.txt -fmin 0.1 -fmax 100 -nf 100 -logsam -nmr 3 -nm
   )
   mask = (disp.rayleigh_valid[:, 0] != 0)
   rayleigh_vel_mode1 = 1.0 / disp.rayleigh_slowness[mask, 0]
-  ```
-
-Troubleshooting imports in notebooks:
-- If running from a subfolder (e.g., `examples/`), make sure the project root is on `sys.path` or `PYTHONPATH` so `import hvswdpy` works:
-  ```python
-  import os, sys
-  ROOT = os.path.abspath(os.path.join(os.getcwd(), ".."))
-  if ROOT not in sys.path:
-      sys.path.insert(0, ROOT)
-  import hvswdpy
   ```
 
 ### Examples
