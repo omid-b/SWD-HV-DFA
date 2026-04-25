@@ -1,0 +1,18 @@
+[build-system]
+requires = ["meson-python>=0.16", "meson>=1.1.0", "numpy"]
+build-backend = "mesonpy"
+
+[project]
+name = "hvswdpy"
+version = "0.1.0"
+description = "HV-SWD-DFA Fortran API and Python wrapper for surface wave dispersion and H/V forward modeling"
+authors = [{name = "Shihao Yuan", email = "syuan@mines.edu"}]
+requires-python = ">=3.9"
+dependencies = ["numpy"]
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = ["matplotlib", "jupyter"]
+
+[tool.meson-python.args]
+install = ['--skip-subprojects']
