@@ -15,6 +15,7 @@ Part 2 — hvswdpy vs Disba: benchmarks runtime for computing Rayleigh and Love
 
 import os
 import sys
+import shutil
 from pathlib import Path
 import subprocess
 import time
@@ -36,24 +37,23 @@ print(f"[setup] Root dir     : {ROOT}")
 print(f"[setup] Source dir   : {SRC}")
 print(f"[setup] Binary dir   : {BIN}")
 
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
-
 try:
     import hvswdpy as hv
-    print(f"[setup] hvswdpy imported from: {hv.__file__}")
-except Exception as e:
-    print(f"[setup] Import failed ({e}), attempting to build Python extension via setup.py ...")
-    subprocess.run([sys.executable, 'setup.py', 'build_ext', '--inplace'], cwd=str(SRC), check=True)
+except ModuleNotFoundError:
+    sys.path.insert(0, str(SRC))
     import hvswdpy as hv
-    print(f"[setup] hvswdpy built and imported from: {hv.__file__}")
+print(f"[setup] hvswdpy imported from: {hv.__file__}")
 
-hv_cli = BIN / 'hv_orig'
-if not hv_cli.exists():
+hv_which = shutil.which('hv_orig')
+if hv_which:
+    HV_EXE = hv_which
+elif (BIN / 'hv_orig').exists():
+    HV_EXE = str(BIN / 'hv_orig')
+else:
     print('[setup] CLI binary not found, building via make hv_orig in src ...')
     subprocess.run(['make', 'hv_orig'], cwd=str(SRC), check=True)
-    assert hv_cli.exists(), 'Expected hv_orig to be built in bin/'
-HV_EXE = hv_cli
+    assert (BIN / 'hv_orig').exists(), 'Expected hv_orig to be built in bin/'
+    HV_EXE = str(BIN / 'hv_orig')
 print(f"[setup] CLI binary   : {HV_EXE}")
 print("[setup] Setup complete.\n")
 
@@ -215,12 +215,6 @@ print("=" * 60)
 
 from time import perf_counter
 from statistics import median
-
-try:
-    import hvswdpy as hv
-except ModuleNotFoundError:
-    sys.path.insert(0, str(ROOT / 'src'))
-    import hvswdpy as hv
 
 try:
     from disba import PhaseDispersion

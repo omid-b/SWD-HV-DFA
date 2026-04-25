@@ -16,6 +16,7 @@ Steps:
 # ── Setup and imports ────────────────────────────────────────────────────────
 import os
 import sys
+import shutil
 import subprocess
 from pathlib import Path
 import numpy as np
@@ -65,9 +66,9 @@ def read_model(path):
 
 
 def run_cli(model_file, nf=100, fmin=0.1, fmax=100.0, nmr=3, nml=3, prec=1.0, nks=0):
-    hv_orig = ROOT / 'bin' / 'hv_orig'
+    hv_orig = shutil.which('hv_orig') or str(ROOT / 'bin' / 'hv_orig')
     cmd = [
-        str(hv_orig),
+        hv_orig,
         '-f', str(model_file),
         '-fmin', str(fmin),
         '-fmax', str(fmax),
