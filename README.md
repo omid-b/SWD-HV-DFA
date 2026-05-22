@@ -3,7 +3,7 @@
 Fortran implementation of H/V spectral ratio and surface-wave dispersion, with a thin Python wrapper. The Python API mirrors the original CLI and offers simple functions.
 
 - **Original authors**: HV‑INV project team (see headers in `HV.f90`)
-- **Modifications and API**: Shihao Yuan (`syuan@mines.edu`)
+- **Modifications and API**: Shihao Yuan (`shihao.yuan@univ-grenoble-alpes.fr`)
 
 ### DISCLAIMER
 This is a development build. The code may contain errors or unstable functionality. Contributions and feedback are welcome.
